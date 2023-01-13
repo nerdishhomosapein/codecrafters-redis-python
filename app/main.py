@@ -8,14 +8,16 @@ def main():
     print("Logs from your program will appear here!")
 
     server_socket = socket.create_server(("localhost", 6379), reuse_port=True)
-    connection, address = server_socket.accept() # wait for client
-    data = connection.recv(1024).decode()
-    
-    print(f"{data=}")
-    regex = re.compile(r"\bping\b")
-    if re.findall(regex, data) and len(re.findall(regex, data)) > 0:
-        response = "+PONG\r\n"
-        connection.send(response.encode())
+    connection, _ = server_socket.accept()  # wait for client
+
+    while True:
+        data = connection.recv(1024).decode()
+
+        print(f"{data=}")
+        regex = re.compile(r"\bping\b")
+        if re.findall(regex, data) and len(re.findall(regex, data)) > 0:
+            response = "+PONG\r\n"
+            connection.send(response.encode())
 
 if __name__ == "__main__":
     main()

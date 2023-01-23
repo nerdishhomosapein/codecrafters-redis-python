@@ -4,6 +4,7 @@ from _thread import *
 import re
 
 
+dictionary = {}
 def threaded_client(connection):
 
     while True:
@@ -30,6 +31,22 @@ def threaded_client(connection):
                         wordPointer += 2
                         wordLengthPointer += 2
                     connection.sendall(response.encode())
+                elif firstCommand and (firstCommand.lower() == "set"):
+                    key = dataArray[4]
+                    value = dataArray[6]
+                    if key and value:
+                        dictionary[key] = value
+                        response = "+OK\r\n"
+                        connection.sendall(response.encode())
+                elif firstCommand and (firstCommand.lower() == "get"):
+                    key = dataArray[4]
+                    if key:
+                        if key in dictionary:
+                            response = f"${len(dictionary[key])}\r\n{dictionary[key]}\r\n"
+                            connection.sendall(response.encode())
+                        else:
+                            response = "$-1\r\n"
+                            connection.sendall(response.encode())
                 else:
                     response = "+PONG\r\n"
                     connection.sendall(response.encode())
